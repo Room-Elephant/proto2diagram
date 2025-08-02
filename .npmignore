@@ -1,0 +1,35 @@
+# Ignore tests and config files not needed in npm package
+**/*.spec.js
+
+# Ignore editor and IDE configs
+.vscode/
+.idea/
+
+# Ignore local env files
+.env
+
+# Ignore git files
+.git/
+.gitignore
+
+# Ignore logs
+logs/
+*.log
+
+# Ignore npm debug files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignore coverage reports
+coverage/
+
+# Ignore markdown docs not essential for npm package
+docs/
+*.md
+!README.md
+
+# Ignore config files
+.prettierrc
+jest.config.js
+eslint.config.js

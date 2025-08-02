@@ -1,0 +1,62 @@
+{
+  "name": "proto2diagram",
+  "version": "1.0.0",
+  "description": "Convert Protocol Buffer definitions to PlantUML diagrams",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./src/index.js"
+    }
+  },
+  "files": [
+    "src",
+    "example",
+    "README.md",
+    "package.json"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "protobuf",
+    "protocol-buffers",
+    "plantuml",
+    "diagram",
+    "visualization",
+    "uml",
+    "converter",
+    "library",
+    "javascript",
+    "plantuml generator",
+    "proto visualizer"
+  ],
+  "author": "Room-Elephant",
+  "license": "MIT",
+  "homepage": "https://github.com/Room-Elephant/proto2diagram#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Room-Elephant/proto2diagram.git",
+    "directory": "."
+  },
+  "bugs": {
+    "url": "https://github.com/Room-Elephant/proto2diagram/issues"
+  },
+  "scripts": {
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
+    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
+    "lint": "eslint src --ext .js --fix",
+    "format": "prettier --write .",
+    "example": "node ./example/example.js"
+  },
+  "dependencies": {
+    "pako": "^2.1.0",
+    "protobufjs": "^7.5.3"
+  },
+  "devDependencies": {
+    "eslint": "^9.32.0",
+    "eslint-plugin-prettier": "^5.5.3",
+    "jest": "^30.0.5",
+    "prettier": "^3.6.2"
+  }
+}
