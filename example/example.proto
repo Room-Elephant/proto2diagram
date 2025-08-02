@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package com.roomelephant;
+
+message User {
+  string name = 1;
+  optional int32 age = 2;
+  Status status = 3;
+  repeated string emails = 4;
+  Address address = 5;
+
+  enum Status {
+    UNKNOWN = 0;
+    ACTIVE = 1;
+    INACTIVE = 2;
+  }
+}
+
+message Address {
+  string street = 1;
+  string city = 2;
+  string country = 3;
+}
+
+message GetUserRequest {
+  string user_id = 1;
+}
+
+message UpdateUserRequest {
+  string user_id = 1;
+  User user = 2;
+}
