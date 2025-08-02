@@ -1,6 +1,6 @@
 // Protobuf parsing module
 import { CONFIG } from "./config.js";
-import protobuf from 'protobufjs';
+import protobuf from "protobufjs";
 
 export class ProtoParser {
   constructor() {
@@ -10,7 +10,7 @@ export class ProtoParser {
 
   // First pass: collect all type and enum names
   collectTypes(ns, parentName = "") {
-    if (!ns || typeof ns !== 'object') {
+    if (!ns || typeof ns !== "object") {
       return; // Gracefully handle invalid namespace
     }
 
@@ -39,9 +39,9 @@ export class ProtoParser {
     if (!messageType.name) {
       throw new Error(`Type at key '${key}' has no name`);
     }
-    
+
     this.knownTypes.add(messageType.name);
-    
+
     // Recursively collect nested types within this message
     if (messageType.nested) {
       this.collectTypes(messageType, messageType.name);
@@ -53,15 +53,15 @@ export class ProtoParser {
     if (!enumType.name) {
       throw new Error(`Enum at key '${key}' has no name`);
     }
-    
+
     // Store both the original name and the prefixed name for compatibility
     const originalName = enumType.name;
     const prefixedName = this.generateEnumName(enumType.name, parentName);
-    
+
     // Add both names to known types to support both approaches
     this.knownTypes.add(originalName);
     this.knownEnumTypes.add(originalName);
-    
+
     // Also add prefixed name for backward compatibility with existing relationships
     if (parentName) {
       this.knownTypes.add(prefixedName);
@@ -81,7 +81,7 @@ export class ProtoParser {
     }
 
     if (!field.type) {
-      throw new Error(`Field ${field.name || 'unknown'} has no type defined`);
+      throw new Error(`Field ${field.name || "unknown"} has no type defined`);
     }
 
     // For maps, field.type is the value type
@@ -95,7 +95,7 @@ export class ProtoParser {
 
   // Helper function to convert snake_case to camelCase
   toCamelCase(str) {
-    if (!str || typeof str !== 'string') {
+    if (!str || typeof str !== "string") {
       return str;
     }
     return str.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase());
@@ -103,7 +103,7 @@ export class ProtoParser {
 
   // Helper function to resolve the actual type name for relationships
   resolveTypeName(fieldType, parentTypeName) {
-    if (!fieldType || typeof fieldType !== 'string') {
+    if (!fieldType || typeof fieldType !== "string") {
       throw new Error("Field type must be a non-empty string");
     }
 
@@ -113,7 +113,7 @@ export class ProtoParser {
     }
 
     // For backward compatibility, check if this might be a nested enum with the parent prefix
-    if (parentTypeName && typeof parentTypeName === 'string') {
+    if (parentTypeName && typeof parentTypeName === "string") {
       const nestedEnumName = `${parentTypeName}_${fieldType}`;
       if (this.knownTypes.has(nestedEnumName)) {
         return nestedEnumName;
@@ -134,12 +134,12 @@ export class ProtoParser {
     if (field.map || field.repeated) {
       return CONFIG.UML.CARDINALITY.MULTIPLE;
     }
-    
+
     // Optional cardinality for optional fields and oneof fields
     if (this.isOptionalField(field)) {
       return CONFIG.UML.CARDINALITY.OPTIONAL;
     }
-    
+
     // Default to required for regular fields in proto3
     return CONFIG.UML.CARDINALITY.REQUIRED;
   }
@@ -151,7 +151,7 @@ export class ProtoParser {
 
   // Determine relationship type based on field type
   getRelationshipType(resolvedType) {
-    if (!resolvedType || typeof resolvedType !== 'string') {
+    if (!resolvedType || typeof resolvedType !== "string") {
       return CONFIG.UML.RELATIONSHIPS.COMPOSITION; // Default fallback
     }
 
@@ -159,14 +159,14 @@ export class ProtoParser {
     if (this.knownEnumTypes.has(resolvedType)) {
       return CONFIG.UML.RELATIONSHIPS.COMPOSITION;
     }
-    
+
     // Message types = Composition (ownership/containment)
     return CONFIG.UML.RELATIONSHIPS.AGGREGATION;
   }
 
   // Parse protobuf content and return structured data
   parseProtoString(content) {
-    if (!content || typeof content !== 'string' || content.trim().length === 0) {
+    if (!content || typeof content !== "string" || content.trim().length === 0) {
       throw new Error("Proto content must be a non-empty string");
     }
 
@@ -206,7 +206,7 @@ export class ProtoParser {
       throw new Error("File object cannot be null or undefined");
     }
 
-    if (typeof file.text !== 'function') {
+    if (typeof file.text !== "function") {
       throw new Error("File object must have a text() method");
     }
 

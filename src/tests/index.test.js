@@ -2,34 +2,34 @@
  * Integration tests for the main Proto2Diagram library
  */
 
-import { Proto2Diagram } from '../index.js';
+import { Proto2Diagram } from "../index.js";
 
-describe('Proto2Diagram Integration', () => {
+describe("Proto2Diagram Integration", () => {
   let lib;
 
   beforeEach(() => {
     lib = new Proto2Diagram();
   });
 
-  describe('constructor', () => {
-    test('should create instance with default options', () => {
+  describe("constructor", () => {
+    test("should create instance with default options", () => {
       const instance = new Proto2Diagram();
       expect(instance).toBeInstanceOf(Proto2Diagram);
-      expect(instance.options).toHaveProperty('plantumlEndpoint');
+      expect(instance.options).toHaveProperty("plantumlEndpoint");
     });
 
-    test('should create instance with custom options', () => {
-      const customEndpoint = 'https://custom.plantuml.server';
+    test("should create instance with custom options", () => {
+      const customEndpoint = "https://custom.plantuml.server";
       const instance = new Proto2Diagram({
-        plantumlEndpoint: customEndpoint
+        plantumlEndpoint: customEndpoint,
       });
-      
+
       expect(instance.options.plantumlEndpoint).toBe(customEndpoint);
     });
   });
 
-  describe('generatePlantUMLCode', () => {
-    test('should generate PlantUML for simple message', () => {
+  describe("generatePlantUMLCode", () => {
+    test("should generate PlantUML for simple message", () => {
       const proto = `
         syntax = "proto3";
         message User {
@@ -40,14 +40,14 @@ describe('Proto2Diagram Integration', () => {
 
       const result = lib.generatePlantUMLCode(proto);
 
-      expect(result).toContain('@startuml');
-      expect(result).toContain('@enduml');
-      expect(result).toContain('object User {');
-      expect(result).toContain('name : string');
-      expect(result).toContain('age : int32');
+      expect(result).toContain("@startuml");
+      expect(result).toContain("@enduml");
+      expect(result).toContain("object User {");
+      expect(result).toContain("name : string");
+      expect(result).toContain("age : int32");
     });
 
-    test('should handle package correctly', () => {
+    test("should handle package correctly", () => {
       const proto = `
         syntax = "proto3";
         package com.example.api;
@@ -59,34 +59,34 @@ describe('Proto2Diagram Integration', () => {
       const result = lib.generatePlantUMLCode(proto);
 
       expect(result).toContain('package "com.example.api" {');
-      expect(result).toContain('object User {');
+      expect(result).toContain("object User {");
     });
 
-    test('should throw error for invalid proto', () => {
-      const invalidProto = 'invalid proto syntax';
-      
+    test("should throw error for invalid proto", () => {
+      const invalidProto = "invalid proto syntax";
+
       expect(() => {
         lib.generatePlantUMLCode(invalidProto);
-      }).toThrow('Failed to generate PlantUML code');
+      }).toThrow("Failed to generate PlantUML code");
     });
 
-    test('should validate input parameters', () => {
+    test("should validate input parameters", () => {
       expect(() => {
         lib.generatePlantUMLCode(null);
-      }).toThrow('Failed to generate PlantUML code');
+      }).toThrow("Failed to generate PlantUML code");
 
       expect(() => {
         lib.generatePlantUMLCode(undefined);
-      }).toThrow('Failed to generate PlantUML code');
+      }).toThrow("Failed to generate PlantUML code");
 
       expect(() => {
-        lib.generatePlantUMLCode('');
-      }).toThrow('Failed to generate PlantUML code');
+        lib.generatePlantUMLCode("");
+      }).toThrow("Failed to generate PlantUML code");
     });
   });
 
-  describe('generateDiagramUrl', () => {
-    test('should generate diagram URL with PlantUML code', async () => {
+  describe("generateDiagramUrl", () => {
+    test("should generate diagram URL with PlantUML code", async () => {
       const proto = `
         syntax = "proto3";
         message User {
@@ -96,46 +96,48 @@ describe('Proto2Diagram Integration', () => {
 
       const result = await lib.generateDiagramUrl(proto);
 
-      expect(result).toHaveProperty('imageUrl');
-      expect(result).toHaveProperty('plantumlCode');
-      expect(result).toHaveProperty('success');
+      expect(result).toHaveProperty("imageUrl");
+      expect(result).toHaveProperty("plantumlCode");
+      expect(result).toHaveProperty("success");
       expect(result.success).toBe(true);
-      expect(typeof result.imageUrl).toBe('string');
-      expect(result.imageUrl).toContain('http');
-      expect(result.plantumlCode).toContain('@startuml');
+      expect(typeof result.imageUrl).toBe("string");
+      expect(result.imageUrl).toContain("http");
+      expect(result.plantumlCode).toContain("@startuml");
     });
 
-    test('should handle custom endpoint', async () => {
-      const customEndpoint = 'https://custom.plantuml.server';
+    test("should handle custom endpoint", async () => {
+      const customEndpoint = "https://custom.plantuml.server";
       const proto = `
         syntax = "proto3";
         message User { string name = 1; }
       `;
 
       const result = await lib.generateDiagramUrl(proto, {
-        plantumlEndpoint: customEndpoint
+        plantumlEndpoint: customEndpoint,
       });
 
       expect(result.imageUrl).toContain(customEndpoint);
     });
 
-    test('should throw error for invalid options', async () => {
+    test("should throw error for invalid options", async () => {
       const proto = `syntax = "proto3"; message User { string name = 1; }`;
-      
-      await expect(lib.generateDiagramUrl(proto, "invalid")).rejects.toThrow('Options must be an object or null');
+
+      await expect(lib.generateDiagramUrl(proto, "invalid")).rejects.toThrow("Options must be an object or null");
     });
 
-    test('should throw error for invalid endpoint', async () => {
+    test("should throw error for invalid endpoint", async () => {
       const proto = `syntax = "proto3"; message User { string name = 1; }`;
-      
-      await expect(lib.generateDiagramUrl(proto, { 
-        plantumlEndpoint: null 
-      })).rejects.toThrow('PlantUML endpoint must be a valid URL string');
+
+      await expect(
+        lib.generateDiagramUrl(proto, {
+          plantumlEndpoint: null,
+        })
+      ).rejects.toThrow("PlantUML endpoint must be a valid URL string");
     });
   });
 
-  describe('comprehensive feature integration', () => {
-    test('should handle complex proto with all features', () => {
+  describe("comprehensive feature integration", () => {
+    test("should handle complex proto with all features", () => {
       const complexProto = `
         syntax = "proto3";
         package com.flutter.gbp.fcq.quote.event;
@@ -197,43 +199,41 @@ describe('Proto2Diagram Integration', () => {
       const result = lib.generatePlantUMLCode(complexProto);
 
       // Check all major features are present
-      expect(result).toContain('!pragma useIntermediatePackages false');
-      expect(result).toContain('skinparam componentStyle rectangle');
+      expect(result).toContain("!pragma useIntermediatePackages false");
+      expect(result).toContain("skinparam componentStyle rectangle");
       expect(result).toContain('package "com.flutter.gbp.fcq.quote.event" {');
-      
+
       // Check oneof notes
-      expect(result).toContain('note right of BetQuoted');
-      expect(result).toContain('Only one of betQuotedSuccessful or betQuotedFailure is set');
-      
+      expect(result).toContain("note right of BetQuoted");
+      expect(result).toContain("Only one of betQuotedSuccessful or betQuotedFailure is set");
+
       // Check optional markers
-      expect(result).toContain('wealthMargin : double ?');
-      expect(result).toContain('remainingLegs : int32 ?');
-      expect(result).toContain('isInplay : bool ?');
-      expect(result).toContain('tradeOutPrice : double ?');
-      
+      expect(result).toContain("wealthMargin : double ?");
+      expect(result).toContain("remainingLegs : int32 ?");
+      expect(result).toContain("isInplay : bool ?");
+      expect(result).toContain("tradeOutPrice : double ?");
+
       // Check map handling
-      expect(result).toContain('legFeatureMapping : map<string, LegFeatures>');
-      
+      expect(result).toContain("legFeatureMapping : map<string, LegFeatures>");
+
       // Check nested enums
-      expect(result).toContain('enum BetQuotedFailure_QuoteStatus {');
-      expect(result).toContain('enum LegFeatures_PricingStrategy {');
-      
+      expect(result).toContain("enum BetQuotedFailure_QuoteStatus {");
+      expect(result).toContain("enum LegFeatures_PricingStrategy {");
+
       // Check relationships (should not be duplicated)
-      const relationshipLines = result.split('\n').filter(line => 
-        line.includes('--') && (line.includes('--*') || line.includes('--o'))
-      );
-      
+      const relationshipLines = result
+        .split("\n")
+        .filter((line) => line.includes("--") && (line.includes("--*") || line.includes("--o")));
+
       // Verify no duplicate relationships to LegFeatures_PricingStrategy
-      const pricingStrategyRelations = relationshipLines.filter(line => 
-        line.includes('LegFeatures_PricingStrategy')
-      );
+      const pricingStrategyRelations = relationshipLines.filter((line) => line.includes("LegFeatures_PricingStrategy"));
       expect(pricingStrategyRelations).toHaveLength(1);
-      
+
       // Verify package closing
-      expect(result).toContain('}\n@enduml');
+      expect(result).toContain("}\n@enduml");
     });
 
-    test('should handle services integration', () => {
+    test("should handle services integration", () => {
       const serviceProto = `
         syntax = "proto3";
         package com.example.service;
@@ -289,51 +289,49 @@ describe('Proto2Diagram Integration', () => {
       const result = lib.generatePlantUMLCode(serviceProto);
 
       // Check service generation
-      expect(result).toContain('control UserService {');
-      expect(result).toContain('GetUser(GetUserRequest) : GetUserResponse');
-      expect(result).toContain('CreateUser(CreateUserRequest) : CreateUserResponse');
-      expect(result).toContain('UpdateUser(UpdateUserRequest) : UpdateUserResponse');
-      
+      expect(result).toContain("control UserService {");
+      expect(result).toContain("GetUser(GetUserRequest) : GetUserResponse");
+      expect(result).toContain("CreateUser(CreateUserRequest) : CreateUserResponse");
+      expect(result).toContain("UpdateUser(UpdateUserRequest) : UpdateUserResponse");
+
       // Check service relationships (should not be duplicated)
-      const serviceRelations = result.split('\n').filter(line => 
-        line.includes('UserService -->')
-      );
-      
+      const serviceRelations = result.split("\n").filter((line) => line.includes("UserService -->"));
+
       // Should have unique relationships to each request/response type
       expect(serviceRelations.length).toBeGreaterThan(0);
-      
+
       // Check that User relationships are not duplicated despite multiple references
-      const userRelations = result.split('\n').filter(line => 
-        line.includes('--*') && line.includes('User') && !line.includes('UserService')
-      );
-      
+      const userRelations = result
+        .split("\n")
+        .filter((line) => line.includes("--*") && line.includes("User") && !line.includes("UserService"));
+
       // Should have unique relationships
       const uniqueUserRelations = [...new Set(userRelations)];
       expect(userRelations).toEqual(uniqueUserRelations);
     });
   });
 
-  describe('error handling', () => {
-    test('should handle malformed proto gracefully', () => {
+  describe("error handling", () => {
+    test("should handle malformed proto gracefully", () => {
       const malformedProtos = [
         'syntax = "proto3"; message {',
         'syntax = "proto3"; message User { string = 1; }',
         'syntax = "proto3"; message User { invalid_type field = 1; }',
-        '',
-        '   ',
-        'not proto at all'
+        "",
+        "   ",
+        "not proto at all",
       ];
 
-      malformedProtos.forEach(proto => {
+      malformedProtos.forEach((proto) => {
         expect(() => {
           lib.generatePlantUMLCode(proto);
         }).toThrow();
       });
     });
 
-    test('should provide meaningful error messages', () => {
+    test("should provide meaningful error messages", () => {
       expect(() => {
-        lib.generatePlantUMLCode('invalid proto');
+        lib.generatePlantUMLCode("invalid proto");
       }).toThrow(/Failed to generate PlantUML code/);
     });
   });

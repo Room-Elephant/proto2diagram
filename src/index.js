@@ -1,14 +1,14 @@
 // Proto to Diagram Library - Main Interface
 // Simple API: proto string in, diagram URL out
 
-import { ProtoParser } from './protoParser.js';
-import { PlantUMLGenerator } from './plantUMLGenerator.js';
-import { generatePlantUMLImageUrl } from './plantumlEncoder.js';
-import { CONFIG } from './config.js';
+import { ProtoParser } from "./protoParser.js";
+import { PlantUMLGenerator } from "./plantUMLGenerator.js";
+import { generatePlantUMLImageUrl } from "./plantumlEncoder.js";
+import { CONFIG } from "./config.js";
 
 /**
  * Main library class for converting Protocol Buffer definitions to diagram URLs
- * 
+ *
  * Usage:
  *   const lib = new Proto2Diagram();
  *   const imageUrl = await lib.generateDiagramUrl(protoString);
@@ -17,9 +17,9 @@ export class Proto2Diagram {
   constructor(options = {}) {
     this.options = {
       plantumlEndpoint: options.plantumlEndpoint || CONFIG.PLANTUML_ENDPOINT,
-      ...options
+      ...options,
     };
-    
+
     // Initialize internal components
     this.protoParser = new ProtoParser();
     this.plantUMLGenerator = new PlantUMLGenerator(this.protoParser);
@@ -27,7 +27,7 @@ export class Proto2Diagram {
 
   /**
    * Main method: converts proto string to diagram image URL
-   * 
+   *
    * @param {string} protoContent - Protocol Buffer definition as string
    * @param {Object} options - Optional generation options
    * @returns {Promise<Object>} Result object with imageUrl and plantumlCode
@@ -35,8 +35,8 @@ export class Proto2Diagram {
    */
   async generateDiagramUrl(protoContent, options = {}) {
     // Validate inputs
-    if (options !== null && typeof options !== 'object') {
-      throw new Error('Options must be an object or null');
+    if (options !== null && typeof options !== "object") {
+      throw new Error("Options must be an object or null");
     }
 
     const validatedOptions = options || {};
@@ -44,32 +44,31 @@ export class Proto2Diagram {
     try {
       // Generate PlantUML code (handles all validation and parsing)
       const plantumlCode = this.generatePlantUMLCode(protoContent);
-      
+
       // Validate PlantUML code was generated
-      if (!plantumlCode || typeof plantumlCode !== 'string') {
-        throw new Error('Failed to generate valid PlantUML code');
+      if (!plantumlCode || typeof plantumlCode !== "string") {
+        throw new Error("Failed to generate valid PlantUML code");
       }
 
       // Determine endpoint
       const endpoint = validatedOptions.plantumlEndpoint || this.options.plantumlEndpoint;
-      if (!endpoint || typeof endpoint !== 'string') {
-        throw new Error('PlantUML endpoint must be a valid URL string');
+      if (!endpoint || typeof endpoint !== "string") {
+        throw new Error("PlantUML endpoint must be a valid URL string");
       }
-      
+
       // Generate image URL
       const imageUrl = generatePlantUMLImageUrl(plantumlCode, endpoint);
-      
+
       // Validate generated URL
-      if (!imageUrl || typeof imageUrl !== 'string') {
-        throw new Error('Failed to generate valid image URL');
+      if (!imageUrl || typeof imageUrl !== "string") {
+        throw new Error("Failed to generate valid image URL");
       }
 
       return {
         imageUrl,
         plantumlCode,
-        success: true
+        success: true,
       };
-      
     } catch (error) {
       throw new Error(`Failed to generate diagram: ${error.message}`);
     }
@@ -77,16 +76,16 @@ export class Proto2Diagram {
 
   /**
    * Generate only PlantUML code without image URL
-   * 
+   *
    * @param {string} protoContent - Protocol Buffer definition as string
    * @returns {string} PlantUML code
    */
   generatePlantUMLCode(protoContent) {
     try {
       this.validateProtoContent(protoContent);
-      
+
       const { root, packageName } = this.protoParser.parseProtoString(protoContent);
-      
+
       return this.plantUMLGenerator.generateFromRoot(root, packageName);
     } catch (error) {
       throw new Error(`Failed to generate PlantUML code: ${error.message}`);
@@ -95,7 +94,7 @@ export class Proto2Diagram {
 
   /**
    * Validate proto file content from string
-   * 
+   *
    * @param {string} protoContent - Proto content to validate
    * @returns {boolean} true if valid
    * @throws {Error} If validation fails
@@ -103,22 +102,22 @@ export class Proto2Diagram {
   validateProtoContent(protoContent) {
     // Type validation
     if (protoContent === null || protoContent === undefined) {
-      throw new Error('Proto content cannot be null or undefined');
+      throw new Error("Proto content cannot be null or undefined");
     }
-    
-    if (typeof protoContent !== 'string') {
+
+    if (typeof protoContent !== "string") {
       throw new Error(`Proto content must be a string, received ${typeof protoContent}`);
     }
 
     // Content validation
     const trimmedContent = protoContent.trim();
     if (trimmedContent.length === 0) {
-      throw new Error('Proto content cannot be empty or contain only whitespace');
+      throw new Error("Proto content cannot be empty or contain only whitespace");
     }
 
     // Basic proto syntax validation
     if (!this.isValidProtoSyntax(trimmedContent)) {
-      throw new Error('Proto content does not appear to contain valid protobuf syntax');
+      throw new Error("Proto content does not appear to contain valid protobuf syntax");
     }
 
     return true;
@@ -126,7 +125,7 @@ export class Proto2Diagram {
 
   /**
    * Basic proto syntax validation
-   * 
+   *
    * @param {string} content - Trimmed proto content
    * @returns {boolean} true if content appears to be valid proto syntax
    */
@@ -145,7 +144,7 @@ export class Proto2Diagram {
 
   /**
    * Get library configuration
-   * 
+   *
    * @returns {Object} Current configuration
    */
   getConfig() {
@@ -154,18 +153,18 @@ export class Proto2Diagram {
 
   /**
    * Update library configuration
-   * 
+   *
    * @param {Object} newOptions - Options to update
    * @throws {Error} If newOptions is invalid
    */
   updateConfig(newOptions) {
-    if (!newOptions || typeof newOptions !== 'object') {
-      throw new Error('New options must be a valid object');
+    if (!newOptions || typeof newOptions !== "object") {
+      throw new Error("New options must be a valid object");
     }
 
     // Validate specific option types if they exist
-    if (newOptions.plantumlEndpoint && typeof newOptions.plantumlEndpoint !== 'string') {
-      throw new Error('plantumlEndpoint must be a string');
+    if (newOptions.plantumlEndpoint && typeof newOptions.plantumlEndpoint !== "string") {
+      throw new Error("plantumlEndpoint must be a string");
     }
 
     this.options = { ...this.options, ...newOptions };
@@ -173,7 +172,7 @@ export class Proto2Diagram {
 
   /**
    * Static method to create and use library in one call
-   * 
+   *
    * @param {string} protoContent - Protocol Buffer definition
    * @param {Object} options - Library options
    * @returns {Promise<Object>} Result with imageUrl and plantumlCode
@@ -181,8 +180,8 @@ export class Proto2Diagram {
    */
   static async generateDiagram(protoContent, options = {}) {
     // Validate inputs before creating instance
-    if (options !== null && typeof options !== 'object') {
-      throw new Error('Options must be an object or null');
+    if (options !== null && typeof options !== "object") {
+      throw new Error("Options must be an object or null");
     }
 
     let lib;
@@ -197,10 +196,10 @@ export class Proto2Diagram {
 }
 
 // Export individual components for advanced usage
-export { ProtoParser } from './protoParser.js';
-export { PlantUMLGenerator } from './plantUMLGenerator.js';
-export { generatePlantUMLImageUrl } from './plantumlEncoder.js';
-export { CONFIG } from './config.js';
+export { ProtoParser } from "./protoParser.js";
+export { PlantUMLGenerator } from "./plantUMLGenerator.js";
+export { generatePlantUMLImageUrl } from "./plantumlEncoder.js";
+export { CONFIG } from "./config.js";
 
 // Default export for simple usage
 export default Proto2Diagram;

@@ -2,17 +2,17 @@
  * Unit tests for ProtoParser
  */
 
-import { ProtoParser } from '../protoParser.js';
+import { ProtoParser } from "../protoParser.js";
 
-describe('ProtoParser', () => {
+describe("ProtoParser", () => {
   let parser;
 
   beforeEach(() => {
     parser = new ProtoParser();
   });
 
-  describe('parseProtoString', () => {
-    test('should parse simple message successfully', () => {
+  describe("parseProtoString", () => {
+    test("should parse simple message successfully", () => {
       const proto = `
         syntax = "proto3";
         message User {
@@ -22,14 +22,14 @@ describe('ProtoParser', () => {
       `;
 
       const result = parser.parseProtoString(proto);
-      
-      expect(result).toHaveProperty('root');
-      expect(result).toHaveProperty('knownTypes');
-      expect(result).toHaveProperty('packageName');
-      expect(result.knownTypes.has('User')).toBe(true);
+
+      expect(result).toHaveProperty("root");
+      expect(result).toHaveProperty("knownTypes");
+      expect(result).toHaveProperty("packageName");
+      expect(result.knownTypes.has("User")).toBe(true);
     });
 
-    test('should extract package name correctly', () => {
+    test("should extract package name correctly", () => {
       const proto = `
         syntax = "proto3";
         package com.example.test;
@@ -39,10 +39,10 @@ describe('ProtoParser', () => {
       `;
 
       const result = parser.parseProtoString(proto);
-      expect(result.packageName).toBe('com.example.test');
+      expect(result.packageName).toBe("com.example.test");
     });
 
-    test('should handle proto without package', () => {
+    test("should handle proto without package", () => {
       const proto = `
         syntax = "proto3";
         message User {
@@ -54,166 +54,166 @@ describe('ProtoParser', () => {
       expect(result.packageName).toBeNull();
     });
 
-    test('should throw error for invalid proto syntax', () => {
-      const invalidProto = 'invalid proto syntax';
-      
+    test("should throw error for invalid proto syntax", () => {
+      const invalidProto = "invalid proto syntax";
+
       expect(() => {
         parser.parseProtoString(invalidProto);
-      }).toThrow('Failed to parse protobuf content');
+      }).toThrow("Failed to parse protobuf content");
     });
 
-    test('should throw error for empty content', () => {
+    test("should throw error for empty content", () => {
       expect(() => {
-        parser.parseProtoString('');
-      }).toThrow('Proto content must be a non-empty string');
+        parser.parseProtoString("");
+      }).toThrow("Proto content must be a non-empty string");
     });
 
-    test('should throw error for null content', () => {
+    test("should throw error for null content", () => {
       expect(() => {
         parser.parseProtoString(null);
-      }).toThrow('Proto content must be a non-empty string');
+      }).toThrow("Proto content must be a non-empty string");
     });
   });
 
-  describe('extractFieldType', () => {
-    test('should extract simple field type', () => {
-      const field = { name: 'test', type: 'string' };
-      const result = parser.extractFieldType(field, 'TestMessage');
-      expect(result).toBe('string');
+  describe("extractFieldType", () => {
+    test("should extract simple field type", () => {
+      const field = { name: "test", type: "string" };
+      const result = parser.extractFieldType(field, "TestMessage");
+      expect(result).toBe("string");
     });
 
-    test('should throw error for field without type', () => {
-      const field = { name: 'test' };
+    test("should throw error for field without type", () => {
+      const field = { name: "test" };
       expect(() => {
-        parser.extractFieldType(field, 'TestMessage');
-      }).toThrow('Field test has no type defined');
+        parser.extractFieldType(field, "TestMessage");
+      }).toThrow("Field test has no type defined");
     });
 
-    test('should throw error for null field', () => {
+    test("should throw error for null field", () => {
       expect(() => {
-        parser.extractFieldType(null, 'TestMessage');
-      }).toThrow('Field cannot be null or undefined');
+        parser.extractFieldType(null, "TestMessage");
+      }).toThrow("Field cannot be null or undefined");
     });
   });
 
-  describe('isWellKnownType', () => {
-    test('should identify Google well-known types', () => {
-      expect(parser.isWellKnownType('google.protobuf.Timestamp')).toBe(true);
-      expect(parser.isWellKnownType('google.protobuf.Duration')).toBe(true);
-      expect(parser.isWellKnownType('google.protobuf.Any')).toBe(true);
+  describe("isWellKnownType", () => {
+    test("should identify Google well-known types", () => {
+      expect(parser.isWellKnownType("google.protobuf.Timestamp")).toBe(true);
+      expect(parser.isWellKnownType("google.protobuf.Duration")).toBe(true);
+      expect(parser.isWellKnownType("google.protobuf.Any")).toBe(true);
     });
 
-    test('should not identify custom types as well-known', () => {
-      expect(parser.isWellKnownType('User')).toBe(false);
-      expect(parser.isWellKnownType('com.example.CustomMessage')).toBe(false);
+    test("should not identify custom types as well-known", () => {
+      expect(parser.isWellKnownType("User")).toBe(false);
+      expect(parser.isWellKnownType("com.example.CustomMessage")).toBe(false);
     });
   });
 
-  describe('getCardinality', () => {
-    test('should return MULTIPLE for repeated fields', () => {
-      const field = { repeated: true, name: 'items' };
+  describe("getCardinality", () => {
+    test("should return MULTIPLE for repeated fields", () => {
+      const field = { repeated: true, name: "items" };
       const result = parser.getCardinality(field);
-      expect(result).toBe('0..*');
+      expect(result).toBe("0..*");
     });
 
-    test('should return MULTIPLE for map fields', () => {
-      const field = { map: true, name: 'mapping' };
+    test("should return MULTIPLE for map fields", () => {
+      const field = { map: true, name: "mapping" };
       const result = parser.getCardinality(field);
-      expect(result).toBe('0..*');
+      expect(result).toBe("0..*");
     });
 
-    test('should return OPTIONAL for optional fields', () => {
-      const field = { rule: 'optional', name: 'optional_field' };
+    test("should return OPTIONAL for optional fields", () => {
+      const field = { rule: "optional", name: "optional_field" };
       const result = parser.getCardinality(field);
-      expect(result).toBe('0..1');
+      expect(result).toBe("0..1");
     });
 
-    test('should return OPTIONAL for oneof fields', () => {
-      const field = { partOf: { name: 'choice' }, name: 'option_a' };
+    test("should return OPTIONAL for oneof fields", () => {
+      const field = { partOf: { name: "choice" }, name: "option_a" };
       const result = parser.getCardinality(field);
-      expect(result).toBe('0..1');
+      expect(result).toBe("0..1");
     });
 
-    test('should return REQUIRED for regular fields', () => {
-      const field = { name: 'required_field' };
+    test("should return REQUIRED for regular fields", () => {
+      const field = { name: "required_field" };
       const result = parser.getCardinality(field);
-      expect(result).toBe('1');
+      expect(result).toBe("1");
     });
 
-    test('should return REQUIRED for null field', () => {
+    test("should return REQUIRED for null field", () => {
       const result = parser.getCardinality(null);
-      expect(result).toBe('1');
+      expect(result).toBe("1");
     });
   });
 
-  describe('isOptionalField', () => {
-    test('should identify optional rule fields as optional', () => {
-      const field = { rule: 'optional' };
+  describe("isOptionalField", () => {
+    test("should identify optional rule fields as optional", () => {
+      const field = { rule: "optional" };
       expect(parser.isOptionalField(field)).toBe(true);
     });
 
-    test('should identify oneof fields as optional', () => {
-      const field = { partOf: { name: 'choice' } };
+    test("should identify oneof fields as optional", () => {
+      const field = { partOf: { name: "choice" } };
       expect(parser.isOptionalField(field)).toBe(true);
     });
 
-    test('should not identify regular fields as optional', () => {
-      const field = { name: 'regular_field' };
+    test("should not identify regular fields as optional", () => {
+      const field = { name: "regular_field" };
       expect(parser.isOptionalField(field)).toBe(false);
     });
   });
 
-  describe('getRelationshipType', () => {
+  describe("getRelationshipType", () => {
     beforeEach(() => {
       // Setup some known enum types for testing
-      parser.knownEnumTypes.add('Status');
-      parser.knownEnumTypes.add('Priority');
+      parser.knownEnumTypes.add("Status");
+      parser.knownEnumTypes.add("Priority");
     });
 
-    test('should return AGGREGATION for enum types', () => {
-      const result = parser.getRelationshipType('Status');
-      expect(result).toBe('--o');
+    test("should return AGGREGATION for enum types", () => {
+      const result = parser.getRelationshipType("Status");
+      expect(result).toBe("--o");
     });
 
-    test('should return COMPOSITION for message types', () => {
-      const result = parser.getRelationshipType('User');
-      expect(result).toBe('--*');
+    test("should return COMPOSITION for message types", () => {
+      const result = parser.getRelationshipType("User");
+      expect(result).toBe("--*");
     });
 
-    test('should return COMPOSITION for unknown types', () => {
-      const result = parser.getRelationshipType('UnknownType');
-      expect(result).toBe('--*');
+    test("should return COMPOSITION for unknown types", () => {
+      const result = parser.getRelationshipType("UnknownType");
+      expect(result).toBe("--*");
     });
 
-    test('should return COMPOSITION for null type', () => {
+    test("should return COMPOSITION for null type", () => {
       const result = parser.getRelationshipType(null);
-      expect(result).toBe('--*');
+      expect(result).toBe("--*");
     });
   });
 
-  describe('toCamelCase', () => {
-    test('should convert snake_case to camelCase', () => {
-      expect(parser.toCamelCase('user_name')).toBe('userName');
-      expect(parser.toCamelCase('first_name_last_name')).toBe('firstNameLastName');
+  describe("toCamelCase", () => {
+    test("should convert snake_case to camelCase", () => {
+      expect(parser.toCamelCase("user_name")).toBe("userName");
+      expect(parser.toCamelCase("first_name_last_name")).toBe("firstNameLastName");
     });
 
-    test('should handle single words', () => {
-      expect(parser.toCamelCase('user')).toBe('user');
-      expect(parser.toCamelCase('name')).toBe('name');
+    test("should handle single words", () => {
+      expect(parser.toCamelCase("user")).toBe("user");
+      expect(parser.toCamelCase("name")).toBe("name");
     });
 
-    test('should handle already camelCase strings', () => {
-      expect(parser.toCamelCase('userName')).toBe('userName');
-      expect(parser.toCamelCase('firstName')).toBe('firstName');
+    test("should handle already camelCase strings", () => {
+      expect(parser.toCamelCase("userName")).toBe("userName");
+      expect(parser.toCamelCase("firstName")).toBe("firstName");
     });
 
-    test('should handle empty strings', () => {
-      expect(parser.toCamelCase('')).toBe('');
+    test("should handle empty strings", () => {
+      expect(parser.toCamelCase("")).toBe("");
     });
   });
 
-  describe('complex proto parsing', () => {
-    test('should parse proto with nested messages and enums', () => {
+  describe("complex proto parsing", () => {
+    test("should parse proto with nested messages and enums", () => {
       const proto = `
         syntax = "proto3";
         package com.example;
@@ -236,13 +236,13 @@ describe('ProtoParser', () => {
       `;
 
       const result = parser.parseProtoString(proto);
-      
-      expect(result.packageName).toBe('com.example');
-      expect(result.knownTypes.has('User')).toBe(true);
-      expect(result.knownTypes.has('Address')).toBe(true);
+
+      expect(result.packageName).toBe("com.example");
+      expect(result.knownTypes.has("User")).toBe(true);
+      expect(result.knownTypes.has("Address")).toBe(true);
     });
 
-    test('should parse proto with services', () => {
+    test("should parse proto with services", () => {
       const proto = `
         syntax = "proto3";
         
@@ -265,10 +265,10 @@ describe('ProtoParser', () => {
       `;
 
       const result = parser.parseProtoString(proto);
-      
-      expect(result.knownTypes.has('GetUserRequest')).toBe(true);
-      expect(result.knownTypes.has('GetUserResponse')).toBe(true);
-      expect(result.knownTypes.has('User')).toBe(true);
+
+      expect(result.knownTypes.has("GetUserRequest")).toBe(true);
+      expect(result.knownTypes.has("GetUserResponse")).toBe(true);
+      expect(result.knownTypes.has("User")).toBe(true);
     });
   });
 });

@@ -2,10 +2,10 @@
  * Unit tests for PlantUMLGenerator
  */
 
-import { PlantUMLGenerator } from '../plantUMLGenerator.js';
-import { ProtoParser } from '../protoParser.js';
+import { PlantUMLGenerator } from "../plantUMLGenerator.js";
+import { ProtoParser } from "../protoParser.js";
 
-describe('PlantUMLGenerator', () => {
+describe("PlantUMLGenerator", () => {
   let generator;
   let parser;
 
@@ -14,8 +14,8 @@ describe('PlantUMLGenerator', () => {
     generator = new PlantUMLGenerator(parser);
   });
 
-  describe('generateFromRoot', () => {
-    test('should generate basic PlantUML structure', () => {
+  describe("generateFromRoot", () => {
+    test("should generate basic PlantUML structure", () => {
       const proto = `
         syntax = "proto3";
         message User {
@@ -27,16 +27,16 @@ describe('PlantUMLGenerator', () => {
       const { root } = parser.parseProtoString(proto);
       const result = generator.generateFromRoot(root);
 
-      expect(result).toContain('@startuml');
-      expect(result).toContain('@enduml');
-      expect(result).toContain('!pragma useIntermediatePackages false');
-      expect(result).toContain('skinparam componentStyle rectangle');
-      expect(result).toContain('object User {');
-      expect(result).toContain('name : string');
-      expect(result).toContain('age : int32');
+      expect(result).toContain("@startuml");
+      expect(result).toContain("@enduml");
+      expect(result).toContain("!pragma useIntermediatePackages false");
+      expect(result).toContain("skinparam componentStyle rectangle");
+      expect(result).toContain("object User {");
+      expect(result).toContain("name : string");
+      expect(result).toContain("age : int32");
     });
 
-    test('should generate PlantUML with package', () => {
+    test("should generate PlantUML with package", () => {
       const proto = `
         syntax = "proto3";
         package com.example.api;
@@ -49,12 +49,12 @@ describe('PlantUMLGenerator', () => {
       const result = generator.generateFromRoot(root, packageName);
 
       expect(result).toContain('package "com.example.api" {');
-      expect(result).toContain('object User {');
-      expect(result).toContain('name : string');
-      expect(result).toContain('}'); // Package closing
+      expect(result).toContain("object User {");
+      expect(result).toContain("name : string");
+      expect(result).toContain("}"); // Package closing
     });
 
-    test('should not create package for simple names', () => {
+    test("should not create package for simple names", () => {
       const proto = `
         syntax = "proto3";
         package simple;
@@ -67,18 +67,18 @@ describe('PlantUMLGenerator', () => {
       const result = generator.generateFromRoot(root, packageName);
 
       expect(result).not.toContain('package "simple" {');
-      expect(result).toContain('object User {');
+      expect(result).toContain("object User {");
     });
 
-    test('should throw error for null root', () => {
+    test("should throw error for null root", () => {
       expect(() => {
         generator.generateFromRoot(null);
-      }).toThrow('Root namespace is required for PlantUML generation');
+      }).toThrow("Root namespace is required for PlantUML generation");
     });
   });
 
-  describe('optional field markers', () => {
-    test('should add ? marker for optional fields', () => {
+  describe("optional field markers", () => {
+    test("should add ? marker for optional fields", () => {
       const proto = `
         syntax = "proto3";
         message User {
@@ -91,12 +91,12 @@ describe('PlantUMLGenerator', () => {
       const { root } = parser.parseProtoString(proto);
       const result = generator.generateFromRoot(root);
 
-      expect(result).toContain('name : string');
-      expect(result).toContain('email : string ?');
-      expect(result).toContain('age : int32 ?');
+      expect(result).toContain("name : string");
+      expect(result).toContain("email : string ?");
+      expect(result).toContain("age : int32 ?");
     });
 
-    test('should add ? marker for oneof fields', () => {
+    test("should add ? marker for oneof fields", () => {
       const proto = `
         syntax = "proto3";
         message Payment {
@@ -110,11 +110,11 @@ describe('PlantUMLGenerator', () => {
       const { root } = parser.parseProtoString(proto);
       const result = generator.generateFromRoot(root);
 
-      expect(result).toContain('creditCard : string?');
-      expect(result).toContain('bankAccount : string?');
+      expect(result).toContain("creditCard : string?");
+      expect(result).toContain("bankAccount : string?");
     });
 
-    test('should not add ? marker for required fields', () => {
+    test("should not add ? marker for required fields", () => {
       const proto = `
         syntax = "proto3";
         message User {
@@ -126,15 +126,15 @@ describe('PlantUMLGenerator', () => {
       const { root } = parser.parseProtoString(proto);
       const result = generator.generateFromRoot(root);
 
-      expect(result).toContain('name : string');
-      expect(result).toContain('age : int32');
-      expect(result).not.toContain('string?');
-      expect(result).not.toContain('int32?');
+      expect(result).toContain("name : string");
+      expect(result).toContain("age : int32");
+      expect(result).not.toContain("string?");
+      expect(result).not.toContain("int32?");
     });
   });
 
-  describe('oneof notes', () => {
-    test('should generate oneof notes for mutually exclusive fields', () => {
+  describe("oneof notes", () => {
+    test("should generate oneof notes for mutually exclusive fields", () => {
       const proto = `
         syntax = "proto3";
         message BetQuoted {
@@ -150,12 +150,12 @@ describe('PlantUMLGenerator', () => {
       const { root } = parser.parseProtoString(proto);
       const result = generator.generateFromRoot(root);
 
-      expect(result).toContain('note right of BetQuoted');
-      expect(result).toContain('Only one of betQuotedSuccessful or betQuotedFailure is set');
-      expect(result).toContain('end note');
+      expect(result).toContain("note right of BetQuoted");
+      expect(result).toContain("Only one of betQuotedSuccessful or betQuotedFailure is set");
+      expect(result).toContain("end note");
     });
 
-    test('should not generate notes for single oneof field', () => {
+    test("should not generate notes for single oneof field", () => {
       const proto = `
         syntax = "proto3";
         message Test {
@@ -168,11 +168,11 @@ describe('PlantUMLGenerator', () => {
       const { root } = parser.parseProtoString(proto);
       const result = generator.generateFromRoot(root);
 
-      expect(result).not.toContain('note right');
-      expect(result).not.toContain('Only one of');
+      expect(result).not.toContain("note right");
+      expect(result).not.toContain("Only one of");
     });
 
-    test('should handle multiple oneof groups', () => {
+    test("should handle multiple oneof groups", () => {
       const proto = `
         syntax = "proto3";
         message Test {
@@ -190,13 +190,13 @@ describe('PlantUMLGenerator', () => {
       const { root } = parser.parseProtoString(proto);
       const result = generator.generateFromRoot(root);
 
-      expect(result).toContain('Only one of optionA or optionB is set');
-      expect(result).toContain('Only one of valueX or valueY is set');
+      expect(result).toContain("Only one of optionA or optionB is set");
+      expect(result).toContain("Only one of valueX or valueY is set");
     });
   });
 
-  describe('enums', () => {
-    test('should generate enums correctly', () => {
+  describe("enums", () => {
+    test("should generate enums correctly", () => {
       const proto = `
         syntax = "proto3";
         enum Status {
@@ -209,13 +209,13 @@ describe('PlantUMLGenerator', () => {
       const { root } = parser.parseProtoString(proto);
       const result = generator.generateFromRoot(root);
 
-      expect(result).toContain('enum Status {');
-      expect(result).toContain('UNKNOWN');
-      expect(result).toContain('ACTIVE');
-      expect(result).toContain('INACTIVE');
+      expect(result).toContain("enum Status {");
+      expect(result).toContain("UNKNOWN");
+      expect(result).toContain("ACTIVE");
+      expect(result).toContain("INACTIVE");
     });
 
-    test('should generate nested enums within components', () => {
+    test("should generate nested enums within components", () => {
       const proto = `
         syntax = "proto3";
         message User {
@@ -231,14 +231,14 @@ describe('PlantUMLGenerator', () => {
       const result = generator.generateFromRoot(root);
 
       expect(result).toContain('component "User Types" {');
-      expect(result).toContain('object User {');
-      expect(result).toContain('enum Status {');
-      expect(result).toContain('UNKNOWN');
-      expect(result).toContain('ACTIVE');
-      expect(result).toContain('status : Status');
+      expect(result).toContain("object User {");
+      expect(result).toContain("enum Status {");
+      expect(result).toContain("UNKNOWN");
+      expect(result).toContain("ACTIVE");
+      expect(result).toContain("status : Status");
     });
 
-    test('should not create components for messages without nested enums', () => {
+    test("should not create components for messages without nested enums", () => {
       const proto = `
         syntax = "proto3";
         message User {
@@ -250,15 +250,15 @@ describe('PlantUMLGenerator', () => {
       const { root } = parser.parseProtoString(proto);
       const result = generator.generateFromRoot(root);
 
-      expect(result).not.toContain('component');
-      expect(result).toContain('object User {');
-      expect(result).toContain('name : string');
-      expect(result).toContain('age : int32');
+      expect(result).not.toContain("component");
+      expect(result).toContain("object User {");
+      expect(result).toContain("name : string");
+      expect(result).toContain("age : int32");
     });
   });
 
-  describe('component grouping', () => {
-    test('should create components for messages with multiple nested enums', () => {
+  describe("component grouping", () => {
+    test("should create components for messages with multiple nested enums", () => {
       const proto = `
         syntax = "proto3";
         message Config {
@@ -282,18 +282,18 @@ describe('PlantUMLGenerator', () => {
       const result = generator.generateFromRoot(root);
 
       expect(result).toContain('component "Config Types" {');
-      expect(result).toContain('object Config {');
-      expect(result).toContain('enum Priority {');
-      expect(result).toContain('enum Status {');
-      expect(result).toContain('LOW');
-      expect(result).toContain('MEDIUM');
-      expect(result).toContain('HIGH');
-      expect(result).toContain('DRAFT');
-      expect(result).toContain('ACTIVE');
-      expect(result).toContain('DISABLED');
+      expect(result).toContain("object Config {");
+      expect(result).toContain("enum Priority {");
+      expect(result).toContain("enum Status {");
+      expect(result).toContain("LOW");
+      expect(result).toContain("MEDIUM");
+      expect(result).toContain("HIGH");
+      expect(result).toContain("DRAFT");
+      expect(result).toContain("ACTIVE");
+      expect(result).toContain("DISABLED");
     });
 
-    test('should handle relationships correctly with component-scoped enums', () => {
+    test("should handle relationships correctly with component-scoped enums", () => {
       const proto = `
         syntax = "proto3";
         message Task {
@@ -313,7 +313,7 @@ describe('PlantUMLGenerator', () => {
       expect(result).toContain('Task --o "1" State');
     });
 
-    test('should group nested types with global types correctly', () => {
+    test("should group nested types with global types correctly", () => {
       const proto = `
         syntax = "proto3";
         
@@ -339,18 +339,18 @@ describe('PlantUMLGenerator', () => {
 
       // Should have component for Request with nested enum
       expect(result).toContain('component "Request Types" {');
-      expect(result).toContain('enum RequestType {');
-      
+      expect(result).toContain("enum RequestType {");
+
       // Should have global enum outside component
-      expect(result).toContain('enum GlobalStatus {');
+      expect(result).toContain("enum GlobalStatus {");
       expect(result).not.toContain('component "GlobalStatus');
-      
+
       // Should have relationships to both
       expect(result).toContain('Request --o "1" RequestType');
       expect(result).toContain('Request --o "1" GlobalStatus');
     });
 
-    test('should validate complete component structure', () => {
+    test("should validate complete component structure", () => {
       const proto = `
         syntax = "proto3";
         message TestMessage {
@@ -367,28 +367,28 @@ describe('PlantUMLGenerator', () => {
 
       // Must have component wrapper
       expect(result).toContain('component "TestMessage Types" {');
-      
+
       // Must have object definition inside component
       const componentStart = result.indexOf('component "TestMessage Types" {');
-      const componentEnd = result.indexOf('}', componentStart + 1);
+      const componentEnd = result.indexOf("}", componentStart + 1);
       const componentContent = result.substring(componentStart, componentEnd + 1);
-      
-      expect(componentContent).toContain('object TestMessage {');
-      expect(componentContent).toContain('enum TestEnum {');
-      expect(componentContent).toContain('status : TestEnum');
-      expect(componentContent).toContain('UNKNOWN');
-      expect(componentContent).toContain('ACTIVE');
-      
+
+      expect(componentContent).toContain("object TestMessage {");
+      expect(componentContent).toContain("enum TestEnum {");
+      expect(componentContent).toContain("status : TestEnum");
+      expect(componentContent).toContain("UNKNOWN");
+      expect(componentContent).toContain("ACTIVE");
+
       // Must have relationship
       expect(result).toContain('TestMessage --o "1" TestEnum');
-      
+
       // Must NOT have prefixed enum name
-      expect(result).not.toContain('TestMessage_TestEnum');
+      expect(result).not.toContain("TestMessage_TestEnum");
     });
   });
 
-  describe('services', () => {
-    test('should generate services with methods', () => {
+  describe("services", () => {
+    test("should generate services with methods", () => {
       const proto = `
         syntax = "proto3";
         service UserService {
@@ -404,12 +404,12 @@ describe('PlantUMLGenerator', () => {
       const { root } = parser.parseProtoString(proto);
       const result = generator.generateFromRoot(root);
 
-      expect(result).toContain('control UserService {');
-      expect(result).toContain('GetUser(GetUserRequest) : GetUserResponse');
-      expect(result).toContain('CreateUser(CreateUserRequest) : CreateUserResponse');
+      expect(result).toContain("control UserService {");
+      expect(result).toContain("GetUser(GetUserRequest) : GetUserResponse");
+      expect(result).toContain("CreateUser(CreateUserRequest) : CreateUserResponse");
     });
 
-    test('should generate service relationships', () => {
+    test("should generate service relationships", () => {
       const proto = `
         syntax = "proto3";
         service UserService {
@@ -422,13 +422,13 @@ describe('PlantUMLGenerator', () => {
       const { root } = parser.parseProtoString(proto);
       const result = generator.generateFromRoot(root);
 
-      expect(result).toContain('UserService --> UserRequest');
-      expect(result).toContain('UserService --> UserResponse');
+      expect(result).toContain("UserService --> UserRequest");
+      expect(result).toContain("UserService --> UserResponse");
     });
   });
 
-  describe('relationships', () => {
-    test('should generate message-to-message relationships', () => {
+  describe("relationships", () => {
+    test("should generate message-to-message relationships", () => {
       const proto = `
         syntax = "proto3";
         message User {
@@ -445,7 +445,7 @@ describe('PlantUMLGenerator', () => {
       expect(result).toContain('User --* "1" Address');
     });
 
-    test('should generate message-to-enum relationships', () => {
+    test("should generate message-to-enum relationships", () => {
       const proto = `
         syntax = "proto3";
         message User {
@@ -463,7 +463,7 @@ describe('PlantUMLGenerator', () => {
       expect(result).toContain('User --o "1" Status');
     });
 
-    test('should not duplicate relationships', () => {
+    test("should not duplicate relationships", () => {
       const proto = `
         syntax = "proto3";
         message User {
@@ -479,13 +479,11 @@ describe('PlantUMLGenerator', () => {
       const { root } = parser.parseProtoString(proto);
       const result = generator.generateFromRoot(root);
 
-      const statusRelations = result.split('\n').filter(line => 
-        line.includes('User --o') && line.includes('Status')
-      );
+      const statusRelations = result.split("\n").filter((line) => line.includes("User --o") && line.includes("Status"));
       expect(statusRelations).toHaveLength(1);
     });
 
-    test('should handle repeated fields cardinality', () => {
+    test("should handle repeated fields cardinality", () => {
       const proto = `
         syntax = "proto3";
         message User {
@@ -502,7 +500,7 @@ describe('PlantUMLGenerator', () => {
       expect(result).toContain('User --* "0..*" Address');
     });
 
-    test('should handle optional field cardinality', () => {
+    test("should handle optional field cardinality", () => {
       const proto = `
         syntax = "proto3";
         message User {
@@ -520,8 +518,8 @@ describe('PlantUMLGenerator', () => {
     });
   });
 
-  describe('map fields', () => {
-    test('should handle map field display', () => {
+  describe("map fields", () => {
+    test("should handle map field display", () => {
       const proto = `
         syntax = "proto3";
         message User {
@@ -535,10 +533,10 @@ describe('PlantUMLGenerator', () => {
       const { root } = parser.parseProtoString(proto);
       const result = generator.generateFromRoot(root);
 
-      expect(result).toContain('addresses : map<string, Address>');
+      expect(result).toContain("addresses : map<string, Address>");
     });
 
-    test('should handle map with optional marker', () => {
+    test("should handle map with optional marker", () => {
       const proto = `
         syntax = "proto3";
         message User {
@@ -549,57 +547,45 @@ describe('PlantUMLGenerator', () => {
       const { root } = parser.parseProtoString(proto);
       const result = generator.generateFromRoot(root);
 
-      expect(result).toContain('scores : map<string, int32>?');
+      expect(result).toContain("scores : map<string, int32>?");
     });
   });
 
-  describe('package flattening logic', () => {
-    test('should use package for meaningful names', () => {
-      const packageInfo = generator.analyzePackageStructure(
-        { nested: {} }, 
-        'com.example.api'
-      );
-      
+  describe("package flattening logic", () => {
+    test("should use package for meaningful names", () => {
+      const packageInfo = generator.analyzePackageStructure({ nested: {} }, "com.example.api");
+
       expect(packageInfo.shouldUsePackage).toBe(true);
-      expect(packageInfo.displayName).toBe('com.example.api');
+      expect(packageInfo.displayName).toBe("com.example.api");
     });
 
-    test('should flatten simple package names', () => {
-      const packageInfo = generator.analyzePackageStructure(
-        { nested: {} }, 
-        'simple'
-      );
-      
+    test("should flatten simple package names", () => {
+      const packageInfo = generator.analyzePackageStructure({ nested: {} }, "simple");
+
       expect(packageInfo.shouldUsePackage).toBe(false);
     });
 
-    test('should flatten very long package names', () => {
+    test("should flatten very long package names", () => {
       const packageInfo = generator.analyzePackageStructure(
-        { nested: {} }, 
-        'com.very.long.package.name.that.is.too.complex.test'
+        { nested: {} },
+        "com.very.long.package.name.that.is.too.complex.test"
       );
-      
+
       expect(packageInfo.shouldUsePackage).toBe(false);
     });
 
-    test('should use package for event/service/api endings', () => {
-      const eventPackage = generator.analyzePackageStructure(
-        { nested: {} }, 
-        'com.example.event'
-      );
-      
-      const servicePackage = generator.analyzePackageStructure(
-        { nested: {} }, 
-        'com.example.service'
-      );
-      
+    test("should use package for event/service/api endings", () => {
+      const eventPackage = generator.analyzePackageStructure({ nested: {} }, "com.example.event");
+
+      const servicePackage = generator.analyzePackageStructure({ nested: {} }, "com.example.service");
+
       expect(eventPackage.shouldUsePackage).toBe(true);
       expect(servicePackage.shouldUsePackage).toBe(true);
     });
   });
 
-  describe('edge cases', () => {
-    test('should handle empty messages', () => {
+  describe("edge cases", () => {
+    test("should handle empty messages", () => {
       const proto = `
         syntax = "proto3";
         message Empty {}
@@ -608,11 +594,11 @@ describe('PlantUMLGenerator', () => {
       const { root } = parser.parseProtoString(proto);
       const result = generator.generateFromRoot(root);
 
-      expect(result).toContain('object Empty {');
-      expect(result).toContain('}');
+      expect(result).toContain("object Empty {");
+      expect(result).toContain("}");
     });
 
-    test('should handle messages with only comments', () => {
+    test("should handle messages with only comments", () => {
       const proto = `
         syntax = "proto3";
         message CommentOnly {
@@ -624,10 +610,10 @@ describe('PlantUMLGenerator', () => {
       const { root } = parser.parseProtoString(proto);
       const result = generator.generateFromRoot(root);
 
-      expect(result).toContain('object CommentOnly {');
+      expect(result).toContain("object CommentOnly {");
     });
 
-    test('should handle well-known types', () => {
+    test("should handle well-known types", () => {
       const proto = `
         syntax = "proto3";
         import "google/protobuf/timestamp.proto";
@@ -639,7 +625,7 @@ describe('PlantUMLGenerator', () => {
       const { root } = parser.parseProtoString(proto);
       const result = generator.generateFromRoot(root);
 
-      expect(result).toContain('createdAt : google.protobuf.Timestamp');
+      expect(result).toContain("createdAt : google.protobuf.Timestamp");
       // Should not create relationship to well-known type
       expect(result).not.toContain('Event --* "1" google.protobuf.Timestamp');
     });
