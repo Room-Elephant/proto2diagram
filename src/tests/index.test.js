@@ -28,6 +28,57 @@ describe("Proto2Diagram Integration", () => {
     });
   });
 
+  describe("generateDiagramUrl", () => {
+    test("should generate diagram URL with PlantUML code", async () => {
+      const proto = `
+        syntax = "proto3";
+        message User {
+          string name = 1;
+        }
+      `;
+
+      const result = await lib.generateDiagramUrl(proto);
+
+      expect(result).toHaveProperty("imageUrl");
+      expect(result).toHaveProperty("plantumlCode");
+      expect(result).toHaveProperty("success");
+      expect(result.success).toBe(true);
+      expect(typeof result.imageUrl).toBe("string");
+      expect(result.imageUrl).toContain("http");
+      expect(result.plantumlCode).toContain("@startuml");
+    });
+
+    test("should handle custom endpoint", async () => {
+      const customEndpoint = "https://custom.plantuml.server";
+      const proto = `
+        syntax = "proto3";
+        message User { string name = 1; }
+      `;
+
+      const result = await lib.generateDiagramUrl(proto, {
+        plantumlEndpoint: customEndpoint,
+      });
+
+      expect(result.imageUrl).toContain(customEndpoint);
+    });
+
+    test("should throw error for invalid options", async () => {
+      const proto = `syntax = "proto3"; message User { string name = 1; }`;
+
+      await expect(lib.generateDiagramUrl(proto, "invalid")).rejects.toThrow("Options must be an object or null");
+    });
+
+    test("should throw error for invalid endpoint", async () => {
+      const proto = `syntax = "proto3"; message User { string name = 1; }`;
+
+      await expect(
+        lib.generateDiagramUrl(proto, {
+          plantumlEndpoint: null,
+        })
+      ).rejects.toThrow("PlantUML endpoint must be a valid URL string");
+    });
+  });
+
   describe("generatePlantUMLCode", () => {
     test("should generate PlantUML for simple message", () => {
       const proto = `
@@ -85,56 +136,39 @@ describe("Proto2Diagram Integration", () => {
     });
   });
 
-  describe("generateDiagramUrl", () => {
-    test("should generate diagram URL with PlantUML code", async () => {
-      const proto = `
-        syntax = "proto3";
-        message User {
-          string name = 1;
-        }
-      `;
+  describe("validateProtoContent", () => {
+    const correctProtoContentStub = `syntax = "proto3";
+message User {
+  string name = 1;
+}`;
 
-      const result = await lib.generateDiagramUrl(proto);
-
-      expect(result).toHaveProperty("imageUrl");
-      expect(result).toHaveProperty("plantumlCode");
-      expect(result).toHaveProperty("success");
-      expect(result.success).toBe(true);
-      expect(typeof result.imageUrl).toBe("string");
-      expect(result.imageUrl).toContain("http");
-      expect(result.plantumlCode).toContain("@startuml");
+    it("should return true for a correct protoContent", () => {
+      const result = lib.validateProtoContent(correctProtoContentStub);
+      expect(result).toBe(true);
     });
 
-    test("should handle custom endpoint", async () => {
-      const customEndpoint = "https://custom.plantuml.server";
-      const proto = `
-        syntax = "proto3";
-        message User { string name = 1; }
-      `;
-
-      const result = await lib.generateDiagramUrl(proto, {
-        plantumlEndpoint: customEndpoint,
+    describe("when proto content is null or undefined", () => {
+      describe("and is null", () => {
+        it("should throw an error with the following text 'Proto content cannot be null or undefined'", () => {
+          expect(() => lib.validateProtoContent(null)).toThrow("Proto content cannot be null or undefined");
+        });
       });
 
-      expect(result.imageUrl).toContain(customEndpoint);
-    });
-
-    test("should throw error for invalid options", async () => {
-      const proto = `syntax = "proto3"; message User { string name = 1; }`;
-
-      await expect(lib.generateDiagramUrl(proto, "invalid")).rejects.toThrow("Options must be an object or null");
-    });
-
-    test("should throw error for invalid endpoint", async () => {
-      const proto = `syntax = "proto3"; message User { string name = 1; }`;
-
-      await expect(
-        lib.generateDiagramUrl(proto, {
-          plantumlEndpoint: null,
-        })
-      ).rejects.toThrow("PlantUML endpoint must be a valid URL string");
+      describe("and is undefined", () => {
+        it("should throw an error with the following text 'Proto content cannot be null or undefined'", () => {
+          expect(() => lib.validateProtoContent()).toThrow("Proto content cannot be null or undefined");
+        });
+      });
     });
   });
+
+  describe("isValidProtoSyntax", () => {});
+
+  describe("getConfig", () => {});
+
+  describe("updateConfig", () => {});
+
+  describe("generateDiagram", () => {});
 
   describe("comprehensive feature integration", () => {
     test("should handle complex proto with all features", () => {

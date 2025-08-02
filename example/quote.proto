@@ -1,0 +1,129 @@
+syntax = "proto3";
+
+package com.flutter.gbp.fcq.quote.event;
+
+// Message definition of a quoting event
+message BetQuoted {
+  oneof betQuoted {
+    BetQuotedSuccessful betQuotedSuccessful = 1;
+    BetQuotedFailure betQuotedFailure = 2;
+  }
+}
+
+// Message definition of a successful quoting event
+message BetQuotedSuccessful {
+  // Bet identifier
+  string betId = 1;
+  // Context call appKey
+  string appKey = 2;
+  // Platform from which this quote was originated
+  Platform platform = 3;
+  // Quote generated for this bet
+  double quote = 4;
+  // Map containing features applied per leg, indexed by selectionRampId
+  map<string,LegFeatures> legFeatureMapping = 5;
+  // UUID generated for this cashout quote event
+  string uuid = 6;
+  /// Map containing SGM context, indexed by SGM Group ref
+  map<string,SgmContext> sgmContexts = 7;
+  // Applied wealth margin
+  optional double wealthMargin = 8;
+  // Number of remaining legs (not resulted)
+  optional int32 remainingLegs = 9;
+  // Account identifier
+  string accountId = 10;
+}
+
+// Message definition of an unsuccessful quoting event
+message BetQuotedFailure {
+  // Bet identifier
+  string betId = 1;
+  // Context call appKey
+  string appKey = 2;
+  // Platform from which this quote was originated
+  Platform platform = 3;
+  // All possible status of a failed quote attempt
+  enum QuoteStatus {
+    UNKNOWN = 0;
+    UNAVAILABLE = 1;
+    BET_CLOSED = 2;
+    NOT_ELIGIBLE = 3;
+    SUSPENDED = 4;
+    QUOTE_TOO_LOW = 5;
+    QUOTE_TOO_LOW_FREE_BET = 6;
+    LEG_RESULT_PENDING = 7;
+  }
+  // Quote status
+  QuoteStatus quoteStatus = 4;
+  // Map containing features applied per leg, indexed by selectionRampId
+  map<string,LegFeatures> legFeatureMapping = 5;
+  // UUID generated for this cashout quote event
+  string uuid = 6;
+  // Map containing SGM context, indexed by SGM Group ref
+  map<string,SgmContext> sgmContexts = 7;
+  // Number of remaining legs (not resulted)
+  optional int32 remainingLegs = 8;
+  // Account identifier
+  string accountId = 9;
+}
+
+// Represents all platforms that can generate events
+enum Platform {
+  UNKNOWN = 0;
+  ONLINE = 1;
+  RETAIL = 2;
+}
+
+// Message definition of applied features per leg
+message LegFeatures {
+  // Possible pricing strategies applied
+  enum PricingStrategy {
+    UNKNOWN_PRICING_STRATEGY = 0;
+    SPORTSBOOK = 1;
+    EXCHANGE = 2;
+    SHORT_PRICE = 3;
+    PROBABILITY_PRICE = 4;
+  }
+  // Pricing strategies applied
+  PricingStrategy pricingStrategyWin  = 1;
+  PricingStrategy pricingStrategyEW  = 2;
+  // Possible market mappings applied
+  enum MarketMapping {
+    UNKNOWN_MARKET_MAPPING = 0;
+    STANDARD = 1;
+    MARKET_MAPPING = 2;
+  }
+  // Market mapping applied
+  MarketMapping marketMapping = 3;
+  // True if this leg is currently inplay, false otherwise
+  optional bool isInplay = 4;
+  // The price used to calculate the quote
+  optional double tradeOutPrice = 5;
+  // Possible leg validation errors
+  enum LegValidationError {
+    UNKNOWN_LEG_VALIDATION_ERROR = 0;
+    MARKET_OR_RUNNER_SUSPENDED = 1;
+    LEG_RESULT_PENDING = 2;
+    RETAIL_MARKET_OR_RUNNER_SUSPENDED = 3;
+    SGM_MARKET_OR_RUNNER_SUSPENDED = 4;
+    MISSING_SPORT = 5;
+    RUNNER_REMOVED = 6;
+    INVALID_HANDICAP = 7;
+    INVALID_DRAW_NO_BET_MAPPING = 8;
+    INPLAY_ANIMAL_RACING_DISABLED = 9;
+    INPLAY_COUNTRY_NOT_ELIGIBLE = 10;
+    INPLAY_ANIMAL_RACING_WITH_STARTING_PRICE = 11;
+    LATE_WITHDRAWAL = 12;
+  }
+  // Error code if the leg is not valid
+  optional LegValidationError legValidationError = 6;
+}
+
+message SgmContext {
+  Fraction probability = 1;
+}
+
+message Fraction {
+  double numerator = 1;
+  double denominator = 2;
+}

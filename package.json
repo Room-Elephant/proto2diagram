@@ -42,10 +42,9 @@
     "url": "https://github.com/Room-Elephant/proto2diagram/issues"
   },
   "scripts": {
-    "test": "node src/tests/runTests.js",
-    "test:jest": "NODE_OPTIONS='--experimental-vm-modules' jest",
-    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' jest --watch",
-    "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:watch": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --watch",
+    "test:coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --coverage",
     "lint": "eslint src --ext .js --fix",
     "format": "prettier --write .",
     "example": "node ./example/example.js"
@@ -55,30 +54,10 @@
     "protobufjs": "^7.5.3"
   },
   "devDependencies": {
-    "prettier": "^3.6.2",
+    "cross-env": "^10.0.0",
     "eslint": "^9.32.0",
     "eslint-plugin-prettier": "^5.5.3",
-    "jest": "^29.7.0"
-  },
-  "jest": {
-    "preset": "@jest/preset-default",
-    "testEnvironment": "node",
-    "extensionsToTreatAsEsm": [
-      ".js"
-    ],
-    "transform": {},
-    "testMatch": [
-      "**/tests/**/*.test.js"
-    ],
-    "collectCoverageFrom": [
-      "*.js",
-      "!coverage/**",
-      "!tests/**"
-    ],
-    "coverageReporters": [
-      "text",
-      "lcov"
-    ],
-    "verbose": true
+    "jest": "^30.0.5",
+    "prettier": "^3.6.2"
   }
 }

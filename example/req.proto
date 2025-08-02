@@ -1,0 +1,73 @@
+syntax = "proto3";
+import "google/protobuf/wrappers.proto";
+
+package com.ppb.sportsbook.bet_recommendation.model;
+
+enum RecommendationType {
+    POPULAR = 0;
+    POPULAR_MULTIPLES = 1;
+    POPULAR_SGM_MULTIPLES = 2;
+    CREATED_BETS = 3;
+    BOOSTED_BETS = 4;
+}
+
+enum SourceType {
+    UNSPECIFIED_SOURCE_TYPE = 0;
+    MANUAL = 1;
+    ORGANIC = 2;
+}
+
+message PopularContext {
+    int32 counter = 1;
+}
+
+message CreatedBetsContext {
+    string display_name = 1;
+    reserved 2;
+    bool featured = 3;
+    bool headline = 4;
+}
+
+message BoostedContext {
+    int32 nudges = 1;
+    float risk_factor = 2;
+    string name = 3;
+    double current_liability = 4;
+    double liability_limit = 5;
+    string subtitle = 6;
+}
+
+message TraceInformation {
+    map<string, string> traceContextMap = 1;
+}
+
+message Bet {
+    string sport_id = 1;
+    google.protobuf.StringValue competition_id = 2;
+    string event_id = 3;
+    string market_id = 4;
+    string selection_id = 5;
+}
+
+message Metadata {
+    google.protobuf.StringValue narrativeId = 1;
+    google.protobuf.StringValue sponsor_id = 2;
+}
+
+message BetRecommendation {
+    string id = 1;
+    RecommendationType recommendation_type = 2;
+    repeated Bet bet_legs = 3;
+    oneof oneOfContext {
+        PopularContext popular_context = 4;
+        CreatedBetsContext created_bets_context = 8;
+        BoostedContext boosted_bets_context = 12;
+    }
+    TraceInformation trace_information = 5;
+    string countryGroup = 6;
+    double odd = 7;
+    google.protobuf.Int32Value weight = 9;
+    Metadata metadata = 10;
+    repeated google.protobuf.StringValue groups = 11;
+    repeated SourceType sources = 13;
+}
