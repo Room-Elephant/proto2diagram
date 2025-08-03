@@ -10,7 +10,7 @@ export function encode(pumlText: string): string {
   let i = 0;
   let c1, c2, c3, c4;
 
-  function encode64(data: string) {
+  function encode64(data: string): string {
     r = "";
     for (i = 0; i < data.length; i += 3) {
       if (i + 2 == data.length) {
