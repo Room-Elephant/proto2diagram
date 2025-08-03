@@ -5,11 +5,12 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./src/index.js"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     }
   },
   "files": [
-    "src",
+    "dist",
     "example",
     "README.md",
     "package.json"
@@ -42,11 +43,12 @@
     "url": "https://github.com/Room-Elephant/proto2diagram/issues"
   },
   "scripts": {
+    "build": "tsc",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
     "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
     "lint": "eslint src --ext .js --fix",
-    "format": "prettier --write .",
+    "format": "prettier --write . --fix",
     "example": "node ./example/example.js"
   },
   "dependencies": {
@@ -54,9 +56,12 @@
     "protobufjs": "^7.5.3"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "eslint": "^9.32.0",
     "eslint-plugin-prettier": "^5.5.3",
     "jest": "^30.0.5",
-    "prettier": "^3.6.2"
+    "prettier": "^3.6.2",
+    "ts-jest": "^29.4.1",
+    "typescript": "^5.9.2"
   }
 }
