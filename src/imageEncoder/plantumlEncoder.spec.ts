@@ -1,4 +1,4 @@
-import { complexPuml, simplePuml } from "../__tests__/input/puml";
+import { complexPuml, simplePuml } from "../tests/input/puml";
 import { encode } from "./plantumlEncoder";
 
 describe("Compress puml", () => {
