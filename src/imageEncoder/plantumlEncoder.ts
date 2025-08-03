@@ -6,35 +6,31 @@
 import pako from "pako";
 
 export function encode(pumlText: string): string {
-  let r = "";
-  let i = 0;
-  let c1, c2, c3, c4;
-
   function encode64(data: string): string {
-    r = "";
-    for (i = 0; i < data.length; i += 3) {
+    let result = "";
+    for (let i = 0; i < data.length; i += 3) {
       if (i + 2 == data.length) {
-        r += append3bytes(data.charCodeAt(i), data.charCodeAt(i + 1), 0);
+        result += append3bytes(data.charCodeAt(i), data.charCodeAt(i + 1), 0);
       } else if (i + 1 == data.length) {
-        r += append3bytes(data.charCodeAt(i), 0, 0);
+        result += append3bytes(data.charCodeAt(i), 0, 0);
       } else {
-        r += append3bytes(data.charCodeAt(i), data.charCodeAt(i + 1), data.charCodeAt(i + 2));
+        result += append3bytes(data.charCodeAt(i), data.charCodeAt(i + 1), data.charCodeAt(i + 2));
       }
     }
-    return r;
+    return result;
   }
 
   function append3bytes(b1: number, b2: number, b3: number): string {
-    c1 = b1 >> 2;
-    c2 = ((b1 & 0x3) << 4) | (b2 >> 4);
-    c3 = ((b2 & 0xf) << 2) | (b3 >> 6);
-    c4 = b3 & 0x3f;
-    r = "";
-    r += encode6bit(c1 & 0x3f);
-    r += encode6bit(c2 & 0x3f);
-    r += encode6bit(c3 & 0x3f);
-    r += encode6bit(c4 & 0x3f);
-    return r;
+    let c1 = b1 >> 2;
+    let c2 = ((b1 & 0x3) << 4) | (b2 >> 4);
+    let c3 = ((b2 & 0xf) << 2) | (b3 >> 6);
+    let c4 = b3 & 0x3f;
+    let result = "";
+    result += encode6bit(c1 & 0x3f);
+    result += encode6bit(c2 & 0x3f);
+    result += encode6bit(c3 & 0x3f);
+    result += encode6bit(c4 & 0x3f);
+    return result;
   }
 
   function encode6bit(b: number): string {
