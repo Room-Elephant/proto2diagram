@@ -47,8 +47,10 @@
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
     "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
-    "lint": "eslint src --ext .js --fix",
-    "format": "prettier --write . --fix",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
     "example": "node ./example/example.js"
   },
   "dependencies": {
