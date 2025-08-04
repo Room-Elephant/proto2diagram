@@ -14,4 +14,6 @@ export default {
       statements: 80,
     },
   },
+  reporters: ["default", "jest-junit"],
+  coverageReporters: ["json", "lcov", "text", "clover"],
 };
