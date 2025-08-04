@@ -5,7 +5,7 @@
 
 import pako from "pako";
 
-export function encode(pumlText: string): string {
+export const encode = (pumlText: string): string => {
   function encode64(data: string): string {
     let result = "";
     for (let i = 0; i < data.length; i += 3) {
@@ -73,4 +73,4 @@ export function encode(pumlText: string): string {
   }
 
   return compressAndEncode(pumlText);
-}
+};
